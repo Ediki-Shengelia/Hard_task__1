@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import List from "../component/List";
 import { serviceApi } from "../lib/ServiceApi";
+import Fetch from "../component/Fetch";
 
 // Add this helper function
 const formatDate = (dateStr) => {
@@ -12,10 +13,15 @@ const Service = () => {
   const [data, setData] = useState({
     service: "",
     start: "",
-
-    price: 30,
   });
 
+  const [WorkerID, setWorkerId] = useState(null);
+  const workersName = [
+    { id: 1, name: "Edwin" },
+    { id: 2, name: "Valeri" },
+    { id: 3, name: "Trump" },
+    { id: 4, name: "Musk" },
+  ];
   function onChangeFunction(e) {
     const { name, value } = e.target;
     setData((prev) => ({ ...prev, [name]: value }));
@@ -24,13 +30,10 @@ const Service = () => {
   async function onSubmitFunction(e) {
     e.preventDefault();
     try {
-      const response = await serviceApi.createService({
+      const response = await serviceApi.createService(WorkerID, {
         title: data.service,
-        start: formatDate(data.start), // "2026-05-16 17:01:00"
-
-        price: Number(data.price),
+        start: formatDate(data.start),
       });
-      setMessage(response.data.message); // ✅ "Service saved! Cost: $90.00"
     } catch (error) {
       // This will now show you the exact Laravel validation errors
       console.log("Error response:", error.response?.data);
@@ -39,7 +42,9 @@ const Service = () => {
 
   return (
     <div>
+      <Fetch/>
       <form onSubmit={onSubmitFunction}>
+
         <input type="datetime-local" name="start" onChange={onChangeFunction} />
 
         <br />
@@ -47,19 +52,16 @@ const Service = () => {
         <List value={data.service} onChange={onChangeFunction} />
 
         <br />
-
-        <label htmlFor="priceId">Price</label>
-
-        <input
-          id="priceId"
-          type="number"
-          name="price"
-          value={data.price}
-          onChange={onChangeFunction}
-        />
+        <select onChange={(e) => setWorkerId(e.target.value)}>
+          <option value="">Select Worker</option>
+          {workersName.map((w) => (
+            <option key={w.id} value={w.id}>
+              {w.name}
+            </option>
+          ))}
+        </select>
 
         <br />
-
         <button>create service</button>
       </form>
     </div>

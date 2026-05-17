@@ -2,92 +2,82 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use App\Models\Worker;
 use DateTime;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $services = Service::all();
+        return response()->json($services);
     }
-    public static function calculateWorkingCost(DateTime $start, string $title, float $pricePerMinute)
+
+    public static function calculateWorkingCost(DateTime $start, string $title)
     {
+        $pricePerMinute = 1;
+
         $services = [
-            ['title' => 'Engine service', 'start' => (clone $start)->modify('+2 days'),                  'duration' => 48 * 60],
-            ['title' => 'Fuel service',   'start' => (clone $start)->modify('+1 hour'),                  'duration' => 1 * 60],
-            ['title' => 'Item service',   'start' => (clone $start)->modify('+125 minutes'),             'duration' => 125],
-            ['title' => 'Electrical',     'start' => (clone $start)->modify('+24 hours +30 minutes'),    'duration' => 24.5 * 60],
+            ['title' => 'Engine service', 'start' => (clone $start)->modify('+2 days')],
+            ['title' => 'Fuel service',   'start' => (clone $start)->modify('+1 hour')],
+            ['title' => 'Item service',   'start' => (clone $start)->modify('+125 minutes')],
+            ['title' => 'Electrical',     'start' => (clone $start)->modify('+24 hours +30 minutes')],
         ];
 
         foreach ($services as $service) {
             if ($title === $service['title']) {
                 $end          = $service['start'];
-                $totalMinutes = ($end->getTimestamp() - $start->getTimestamp()) / 60;  // ✅ minutes, not hours
+                $totalMinutes = ($end->getTimestamp() - $start->getTimestamp()) / 60;
 
                 return [
-                    'title' => $title,                                                  // ✅ added so store() can use it
+                    'title' => $title,
                     'start' => $start->format('Y-m-d H:i'),
                     'end'   => $end->format('Y-m-d H:i'),
-                    'cost'  => '$' . number_format($totalMinutes * $pricePerMinute, 2), // ✅ correct variable name
+                    'cost'  => round($totalMinutes * $pricePerMinute, 2),
                 ];
             }
         }
 
         return null;
     }
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request, Worker $worker)
     {
-
         $request->validate([
             'title' => 'required|string',
             'start' => 'required|date',
-
         ]);
 
         $start  = new DateTime($request->start);
-        $result = $this->calculateWorkingCost($start, $request->title, (float)$request->price);
+        $result = $this->calculateWorkingCost($start, $request->title);
+
+        if (!$result) {
+            return response()->json([
+                'message' => 'Service title not found. Valid titles: Engine service, Fuel service, Item service, Electrical'
+            ], 422);
+        }
 
         $worker->service()->create([
-            'title' => $result['title'],
+            'title'      => $result['title'],
             'start_time' => $result['start'],
             'end_time'   => $result['end'],
+            'price'      => $result['cost'],
         ]);
-
 
         return response()->json([
-            'message' => "Service saved! Cost: {$result['cost']}"
+            'message' => "Service saved! Cost: $" . $result['cost']
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(string $id) {}
+    public function update(Request $request, string $id) {}
+    public function destroy(Service $service)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $service->delete();
+        return response()->json([
+            'message' => "Deleted"
+        ]);
     }
 }

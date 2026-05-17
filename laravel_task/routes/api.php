@@ -10,3 +10,5 @@ use Illuminate\Support\Facades\Route;
 
 // Route::apiResource('/service', ServiceController::class);
 Route::post('/workers/{worker}/services', [ServiceController::class, 'store']);
+Route::delete('/service/{service}', [ServiceController::class, 'destroy']);
+Route::get('/service', [ServiceController::class, 'index']);
