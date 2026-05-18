@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import List from "../component/List";
 import { serviceApi } from "../lib/ServiceApi";
 import Fetch from "../component/Fetch";
-
+import { useNavigate } from 'react-router-dom'
 // Add this helper function
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
@@ -14,7 +14,7 @@ const Service = () => {
     service: "",
     start: "",
   });
-
+const navigate=useNavigate();
   const [WorkerID, setWorkerId] = useState(null);
   const workersName = [
     { id: 1, name: "Edwin" },
@@ -34,6 +34,7 @@ const Service = () => {
         title: data.service,
         start: formatDate(data.start),
       });
+      navigate(0);
     } catch (error) {
       // This will now show you the exact Laravel validation errors
       console.log("Error response:", error.response?.data);
@@ -41,30 +42,41 @@ const Service = () => {
   }
 
   return (
-    <div>
-      <Fetch/>
-      <form onSubmit={onSubmitFunction}>
+    <div className="h-100 d-flex justify-content-center align-items-center container">
+      <div>
+        <Fetch />
+        <form
+          onSubmit={onSubmitFunction}
+          className="bg-light mt-2 p-5 rounded rounded-3"
+        >
+          <input
+            type="datetime-local"
+            className="text-bg-warning form-control w-100"
+            name="start"
+            onChange={onChangeFunction}
+          />
 
-        <input type="datetime-local" name="start" onChange={onChangeFunction} />
+          <br />
 
-        <br />
+          <List value={data.service} onChange={onChangeFunction} />
 
-        <List value={data.service} onChange={onChangeFunction} />
+          <br />
+          <select
+            className="text-bg-primary form-select"
+            onChange={(e) => setWorkerId(e.target.value)}
+          >
+            <option>Select Worker</option>
+            {workersName.map((w) => (
+              <option key={w.id} value={w.id}>
+                {w.name}
+              </option>
+            ))}
+          </select>
 
-        <br />
-        <select onChange={(e) => setWorkerId(e.target.value)}>
-          <option value="">Select Worker</option>
-          {workersName.map((w) => (
-            <option key={w.id} value={w.id}>
-              {w.name}
-            </option>
-          ))}
-        </select>
-
-        <br />
-        <button>create service</button>
-      </form>
-       
+          <br />
+          <button className="btn btn-success">create service</button>
+        </form>
+      </div>
     </div>
   );
 };

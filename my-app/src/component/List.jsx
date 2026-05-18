@@ -11,7 +11,7 @@ const List = ({ value, onChange }) => {
 
   return (
     <div>
-      <select name="service" value={value} onChange={onChange}>
+      <select className="text-dark bg-info form-select" name="service" value={value} onChange={onChange}>
         <option value="">-- Select a service --</option>
         {services.map((s) => (
           <option key={s.title} value={s.title}>
@@ -21,11 +21,11 @@ const List = ({ value, onChange }) => {
       </select>
 
       {selected && (
-        <div>
-          <p>Title: {selected.title}</p>
-          <p>Duration: {selected.timeForDone}</p>
-          <p>Price: ${selected.totalPrice.toFixed(2)}</p>
-          <p>Starts: {selected.start.toLocaleString()}</p>
+        <div className="text-bg-secondary p-2 rounded rounded-2 mt-2">
+          <p className="h1"><span className="text-danger ">Title:</span> {selected.title}</p>
+          <p><span className="text-danger h3">Duration:</span> {selected.timeForDone}</p>
+          <p><span className="text-danger h3">Price:</span> ${selected.totalPrice.toFixed(2)}</p>
+          <p><span className="text-danger h3">Starts:</span> {selected.start.toLocaleString()}</p>
         </div>
       )}
     </div>

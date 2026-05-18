@@ -20,7 +20,7 @@ const BadUser = ({ id }) => {
 
   return (
     <p>
-      <button onClick={createBadUsersList}>BadUser List</button>
+      <button className="btn btn-warning p-2" onClick={createBadUsersList}>BadUser List</button>
     </p>
   );
 };

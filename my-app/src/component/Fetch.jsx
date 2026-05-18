@@ -40,15 +40,19 @@ const Fetch = () => {
   }, []);
 
   return (
-    <div>
+    <div className="vstack gap-2">
       {service.map((el) => (
-        <div key={el.id}>
-          <span style={{ color: "red" }}>
+        <div className="d-flex gap-1" key={el.id}>
+         <div className="text-bg-info p-2 rounded rounded-2">
+           <span className="text-danger fw-bold fst-italic">
             {el.title} {"  "}
           </span>
           <span>{el.start_time}</span>
-          <button onClick={() => DeleteServices(el.id)}>Delete From DB</button>
+         </div>
+         
+           <button className="btn btn-danger p-1" onClick={() => DeleteServices(el.id)}>Delete From DB</button>
           <BadUser id={el.id}/>
+         
         </div>
       ))}
     </div>
