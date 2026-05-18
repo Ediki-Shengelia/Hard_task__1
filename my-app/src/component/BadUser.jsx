@@ -1,7 +1,8 @@
 import React from "react";
 import { serviceApi } from "../lib/ServiceApi";
-
+import {useNavigate} from 'react-router-dom'
 const BadUser = ({ id }) => {
+  const navigate=useNavigate();
   async function createBadUsersList() {
     const raxac = JSON.parse(localStorage.getItem("deletedService"));
     if (!raxac) return;
@@ -13,6 +14,7 @@ const BadUser = ({ id }) => {
         delay_time: raxac.start_time, // ✅ match started_time, not a calculated offset
       });
       await serviceApi.deleteService(id);
+      navigate(0);
     } catch (error) {
       console.log(error);
     }
